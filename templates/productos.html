@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Inventario - Sweet Spot{% endblock %}
+
+{% block content %}
+<section class="container my-5 text-center">
+    <h2 class="section-title">Inventario de Productos</h2>
+
+    <!-- Formulario para agregar -->
+    <form method="POST" id="formularioContacto" class="mx-auto contacto-form">
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Ingrese el Nombre del Producto:</label>
+            <input type="text" class="form-control" name="nombre" placeholder="Producto" required>
+        </div>
+        <div class="mb-3">
+            <label for="cantidad" class="form-label">Ingrese la Cantidad:</label>
+            <input type="number" class="form-control" name="cantidad" placeholder="Cantidad" required>
+        </div>
+        <div class="mb-3">
+            <label for="precio" class="form-label">Ingrese el Precio:</label>
+            <input type="number" class="form-control" step="0.01" name="precio" placeholder="Precio" required>
+        </div>
+        <button type="submit" name="add" class="btn btn-acento">Agregar</button>
+    </form>
+
+    <!-- Formulario de búsqueda -->
+    <section id="productos" class="container my-5 text-center">
+        <h2 class="section-title">Búsqueda de Productos</h2>
+        <form method="GET" action="{{ url_for('productos') }}" class="mt-4">
+            <div class="input-group w-50 mx-auto">
+                <input type="text" name="buscar" class="form-control" placeholder="Buscar producto por nombre">
+                <button type="submit" class="btn btn-acento">Buscar</button>
+            </div>
+        </form>
+    </section>
+
+    <!-- Tabla de productos -->
+    <section id="productos" class="container my-5 text-center">
+        <h2 class="section-title">Nuestros Productos</h2>
+        <div class="table-responsive d-flex justify-content-center">
+            <table class="table table-bordered table-striped table-sm productos-tabla mx-auto">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prod in productos %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ prod.nombre }}</td>
+                        <td>{{ prod.cantidad }}</td>
+                        <td>${{ "%.2f"|format(prod.precio) }}</td>
+                        <td>
+                            <!-- Botón Editar -->
+                            <a href="{{ url_for('editar', id_producto=prod.id_producto) }}"
+                                class="btn btn-outline-primary btn-sm">Editar</a>
+
+                            <!-- Botón Eliminar con confirmación -->
+                            <a href="{{ url_for('eliminar', id_producto=prod.id_producto) }}"
+                                class="btn btn-outline-danger btn-sm"
+                                onclick="return confirm('¿Estás seguro de eliminar este producto?');">
+                                Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</section>
+{% endblock %}

@@ -1,54 +1,100 @@
-/* Reset básico */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* Colores base */
+body {
+  background-color: #fff3f9;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Navbar */
+.sweet-navbar {
+  background-color: #704f46 !important;
+}
+
+.sweet-navbar .nav-link,
+.sweet-navbar .navbar-brand {
+  color: white !important;
+}
+
+/* Footer */
+.sweet-footer {
+  background-color: #704f46;
+}
+
+/* Secciones */
+.section-title {
+  color: #704f46;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Tamaño general del carrusel para pantallas grandes (PC) */
+.carousel,
+.carousel-inner,
+.carousel-item {
+  height: 400px;
+}
+
+/* Tamaño del carrusel en celulares (menos de 768px de ancho) */
+@media (max-width: 767px) {
+  .carousel,
+  .carousel-inner,
+  .carousel-item {
+    height: 250px;
+  }
+}
+
+
+/* Imagen estirada completamente */
+.carousel-item img {
+  width: 100%;
+  height: 100%;
+}
+
+
+/* Tabla de productos */
+.productos-tabla {
+  max-width: 600px;
+}
+
+/* Formulario */
+.contacto-form {
+  max-width: 500px;
+}
+
+/* Botones personalizados */
+.btn-acento {
+  background-color: #38b6ff;
+  color: white;
+}
+
+.btn-outline-acento {
+  border: 2px solid #38b6ff;
+  color: #38b6ff;
+}
+
+.btn-outline-acento:hover {
+  background-color: #38b6ff;
+  color: white;
+}
+
+.navbar-toggler {
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem; 
+}
+
+.navbar-toggler-icon {
+  width: 1.5em;
+  height: 1.5em;
+}
+/* Footer siempre al final de la página */
+html, body {
+  height: 100%;
 }
 
 body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
-/* HEADER */
-header {
-    background-color: #3EB5A7;
-    color: white;
-    padding: 15px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-header h1 {
-    font-size: 1.5rem;
-}
-
-nav a {
-    margin-left: 15px;
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-nav a:hover {
-    text-decoration: underline;
-}
-
-/* CONTENIDO */
 main {
-    flex: 1;
-    padding: 20px 30px;
-}
-
-/* FOOTER */
-footer {
-    background-color: #384152;
-    color: white;
-    text-align: center;
-    padding: 12px;
-    font-size: 0.9rem;
+  flex: 1; /* Ocupa el espacio disponible entre navbar y footer */
 }

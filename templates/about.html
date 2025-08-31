@@ -1,6 +1,56 @@
 {% extends "base.html" %}
 
+{% block title %}Acerca de - Sweet Spot{% endblock %}
+
 {% block content %}
-    <h2>Acerca de</h2>
-    <p>Esta es la página de información sobre el proyecto Flask.</p>
+<section class="container my-5 text-center">
+    <!-- Logo -->
+    <div class="mb-4">
+        <img src="{{ url_for('static', filename='Sweet Spot.png') }}" alt="Sweet Spot Logo" class="img-fluid" style="max-width: 200px;">
+    </div>
+
+    <!-- Título y eslogan -->
+    <p class="lead mb-4">Donde lo dulce se vuelve irresistible</p>
+
+    <!-- Información general -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Fecha de Creación</h5>
+                    <p class="card-text">4 de Julio del 2025</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Ubicación</h5>
+                    <p class="card-text">Shushufindi, Sucumbíos, Ecuador</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Contacto</h5>
+                    <p class="card-text">Email: contacto@sweetspot.com<br>Tel: +593 96 873 8976</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historia / descripción -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm p-4">
+                <h5 class="card-title mb-3">Nuestra Historia</h5>
+                <p class="card-text">
+                    Sweet Spot nació con la idea de endulzar los momentos cotidianos. Ofrecemos manichos, helados artesanales, galletas y postres caseros,
+                    elaborados con pasión y dedicación. Nuestro compromiso es brindar productos de calidad y un servicio cálido para todos nuestros clientes.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

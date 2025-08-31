@@ -1,6 +1,85 @@
 {% extends "base.html" %}
 
+{% block title %}Inicio - Sweet Spot{% endblock %}
+
 {% block content %}
-    <h2>Página de inicio</h2>
-    <p>Bienvenido a mi primera aplicación con Flask y plantillas dinámicas.</p>
+<!-- CARRUSEL -->
+<div id="carousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="https://usi.com.ec/wp-content/uploads/2024/09/banner-manicho-1.webp" class="d-block w-100"
+                alt="Dulces">
+        </div>
+        <div class="carousel-item">
+            <img src="https://m.media-amazon.com/images/I/B1LruMZD+AL.png" class="d-block w-100" alt="Galleta">
+        </div>
+        <div class="carousel-item">
+            <img src="https://blog.chupetemania.com/wp-content/uploads/2014/07/como-hacer-chupetes-helados.jpg"
+                class="d-block w-100" alt="Postres">
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+</div>
+
+<!-- PRODUCTOS -->
+<section id="productos" class="container my-5 text-center">
+    <h2 class="section-title">Nuestros Productos</h2>
+    <div class="table-responsive d-flex justify-content-center">
+        <table class="table table-bordered table-striped table-sm productos-tabla">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Producto</th>
+                    <th>Precio</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Manicho de Chocolate</td>
+                    <td>$0.75</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Helado Artesanal</td>
+                    <td>$0.25</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Galleta Oreo</td>
+                    <td>$0.50</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- FORMULARIO -->
+<section id="contacto" class="container mb-5 text-center">
+    <h2 class="section-title">Contáctanos</h2>
+    <form id="formularioContacto" class="mx-auto contacto-form">
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre:</label>
+            <input type="text" class="form-control" id="nombre" required>
+        </div>
+        <div class="mb-3">
+            <label for="correo" class="form-label">Correo:</label>
+            <input type="email" class="form-control" id="correo" required>
+        </div>
+        <div class="mb-3">
+            <label for="mensaje" class="form-label">Mensaje:</label>
+            <textarea class="form-control" id="mensaje" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-acento">Enviar</button>
+    </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 {% endblock %}
