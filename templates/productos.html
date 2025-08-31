@@ -26,8 +26,8 @@
     <!-- Formulario de búsqueda -->
     <section id="productos" class="container my-5 text-center">
         <h2 class="section-title">Búsqueda de Productos</h2>
-        <form method="GET" action="{{ url_for('productos') }}" class="mt-4">
-            <div class="input-group w-50 mx-auto">
+        <form method="GET" action="{{ url_for('productos') }}" id="formularioContacto" class="mx-auto contacto-form">
+            <div class="mb-3">
                 <input type="text" name="buscar" class="form-control" placeholder="Buscar producto por nombre">
                 <button type="submit" class="btn btn-acento">Buscar</button>
             </div>
