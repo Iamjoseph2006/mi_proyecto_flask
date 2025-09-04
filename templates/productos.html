@@ -73,5 +73,17 @@
             </table>
         </div>
     </section>
+
+    <!-- Botones de visualización en TXT, JSON y CSV -->
+    <section id="archivos-productos" class="container my-4 text-center">
+        <h3 class="section-title">Ver Productos en Archivos TXT, JSON y CSV</h3>
+        <div class="d-flex justify-content-center gap-3 mt-3 flex-wrap">
+            <a href="{{ url_for('productos_txt') }}" class="btn btn-outline-primary">Ver TXT</a>
+            <a href="{{ url_for('productos_json') }}" class="btn btn-outline-success">Ver JSON</a>
+            <a href="{{ url_for('productos_csv') }}" class="btn btn-outline-info">Ver CSV</a>
+        </div>
+    </section>
+
+
 </section>
 {% endblock %}

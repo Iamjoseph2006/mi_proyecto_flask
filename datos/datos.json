@@ -1,0 +1,17 @@
+[
+    {
+        "nombre": "Manicho de Chocolate",
+        "cantidad": 10,
+        "precio": 0.75
+    },
+    {
+        "nombre": "Helado Artesanal",
+        "cantidad": 15,
+        "precio": 0.25
+    },
+    {
+        "nombre": "Galleta Oreo",
+        "cantidad": 5,
+        "precio": 0.5
+    }
+]

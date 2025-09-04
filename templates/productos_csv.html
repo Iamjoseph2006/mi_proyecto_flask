@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Productos CSV{% endblock %}
+
+{% block content %}
+<!-- Tabla de productos CSV -->
+<section id="productos-csv" class="container my-5 text-center">
+    <h2 class="section-title">📊 Productos desde CSV</h2>
+    <div class="table-responsive d-flex justify-content-center">
+        <table class="table table-bordered table-striped table-sm productos-tabla mx-auto">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prod in productos %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ prod["nombre"] }}</td>
+                    <td>{{ prod["cantidad"] }}</td>
+                    <td>${{ "%.2f"|format(prod["precio"]|float) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
