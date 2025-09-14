@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from inventario.inventario import Inventario  # Tu clase de inventario con SQLite
+from inventario.inventario import Inventario  # Tu clase con SQLite
+from conexion.conexion import obtener_conexion_mysql
 import os
 import json
 import csv
@@ -151,6 +152,16 @@ def productos_json():
 def productos_csv():
     productos = leer_csv()
     return render_template("productos_csv.html", productos=productos)
+
+
+@app.route("/test_db")
+def test_db():
+    conexion = obtener_conexion_mysql()
+    if conexion:
+        conexion.close()
+        return "✅ Conexión a MySQL correcta"
+    else:
+        return "❌ No se pudo conectar a MySQL"
 
 # ------------------ EJECUTAR APP ------------------
 if __name__ == "__main__":
