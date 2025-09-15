@@ -20,13 +20,23 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse justify-content-end" id="menu">
-                <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/about">Nosotros</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/productos">Productos</a></li>
-                </ul>
-            </div>
+<div class="collapse navbar-collapse justify-content-end" id="menu">
+    <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about">Nosotros</a></li>
+        <li class="nav-item"><a class="nav-link" href="/productos">Productos</a></li>
+        
+        {% if current_user.is_authenticated %}
+        <!-- MOSTRAR CUANDO EL USUARIO ESTÁ LOGUEADO -->
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}">Cerrar Sesión</a>
+        </li>
+        {% else %}
+        <!-- MOSTRAR CUANDO EL USUARIO NO ESTÁ LOGUEADO -->
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Iniciar Sesión</a></li>
+        {% endif %}
+    </ul>
+</div>
 
         </div>
     </nav>

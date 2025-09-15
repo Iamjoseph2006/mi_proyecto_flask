@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section id="dashboard" class="container text-center my-5">
+    <h2 class="section-title">Panel de Usuario</h2>
+    <p class="lead">Bienvenido, <strong>{{ nombre }}</strong> 👋</p>
+    <p>Tu rol actual es: <span class="badge bg-info">{{ rol }}</span></p>
+
+    <div class="mt-4">
+        <a href="{{ url_for('productos') }}" class="btn btn-outline-acento">Ver Productos</a>
+        <a href="{{ url_for('logout') }}" class="btn btn-danger">Cerrar Sesión</a>
+    </div>
+</section>
+{% endblock %}

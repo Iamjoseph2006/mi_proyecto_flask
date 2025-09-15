@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section id="register" class="container mb-5 text-center">
+    <h2 class="section-title">Registro de Usuario</h2>
+    <form method="POST" class="mx-auto contacto-form" style="max-width:400px;">
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre:</label>
+            <input type="text" name="nombre" class="form-control" placeholder="Nombre" required>
+        </div>
+        <div class="mb-3">
+            <label for="mail" class="form-label">Correo Electrónico:</label>
+            <input type="email" name="mail" class="form-control" placeholder="Correo" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Contraseña:</label>
+            <input type="password" name="password" class="form-control" placeholder="Contraseña" required>
+        </div>
+        <div class="mb-3">
+            <label for="rol" class="form-label">Rol:</label>
+            <select name="rol" class="form-control" required>
+                <option value="cliente">Cliente</option>
+                <option value="empleado">Empleado</option>
+                <option value="admin">Administrador</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-outline-acento w-100">Registrar</button>
+    </form>
+    <p class="mt-3">¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia sesión</a></p>
+</section>
+{% endblock %}

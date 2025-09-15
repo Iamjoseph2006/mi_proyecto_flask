@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- MENSAJES FLASH COMPACTOS -->
+<div class="container mt-3" style="max-width: 400px; margin-left: auto; margin-right: auto;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show py-2" role="alert" style="font-size: 0.9rem;">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.5rem;"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+<section id="login" class="container mb-5 text-center">
+    <h2 class="section-title">Iniciar Sesión</h2>
+    <form method="POST" class="mx-auto contacto-form" action="{{ url_for('login') }}" style="max-width:400px;">
+        <div class="mb-3">
+            <label for="email" class="form-label">Correo Electrónico:</label>
+            <input type="email" name="mail" class="form-control" placeholder="Correo" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Contraseña:</label>
+            <input type="password" name="password" class="form-control" placeholder="Contraseña" required>
+        </div>
+        <button type="submit" class="btn btn-outline-acento w-100">Ingresar</button>
+    </form>
+    <p class="mt-3">¿No tienes cuenta? <a href="{{ url_for('register') }}">Regístrate aquí</a></p>
+</section>
+{% endblock %}
