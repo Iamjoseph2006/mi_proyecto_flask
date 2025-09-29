@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Detalle Venta #{{ venta.id_venta }}{% endblock %}
+{% block content %}
+<div class="container my-5">
+    <h2 class="section-title">Detalle de Venta #{{ venta.id_venta }}</h2>
+    <p><strong>Cliente:</strong> {{ venta.cliente }}</p>
+    <p><strong>Fecha:</strong> {{ venta.fecha }}</p>
+    <p><strong>Total:</strong> ${{ "%.2f"|format(venta.total) }}</p>
+
+    <h4 class="mt-4">Productos</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID Producto</th>
+                <th>Nombre</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in detalles %}
+            <tr>
+                <td>{{ d.id_producto }}</td>
+                <td>{{ d.nombre }}</td>
+                <td>{{ d.cantidad }}</td>
+                <td>${{ "%.2f"|format(d.precio_unitario) }}</td>
+                <td>${{ "%.2f"|format(d.cantidad * d.precio_unitario) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">⬅ Volver</a>
+</div>
+{% endblock %}

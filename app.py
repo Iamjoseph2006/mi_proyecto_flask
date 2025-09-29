@@ -145,7 +145,7 @@ def agregar_carrito(id_producto):
                     item["cantidad"] += 1
                     flash(f"{producto['nombre']} +1 en el carrito.", "info")
                 else:
-                    flash("Stock insuficiente.", "warning")
+                    flash("Stock Insuficiente.", "warning")
                 break
         else:
             if producto["cantidad"] > 0:  # Solo agregar si hay stock
@@ -155,7 +155,7 @@ def agregar_carrito(id_producto):
                     "precio": float(producto["precio"]),
                     "cantidad": 1
                 })
-                flash(f"{producto['nombre']} agregado al carrito.", "success")
+                flash(f"{producto['nombre']} Agregado al Carrito. ✅", "success")
             else:
                 flash("Producto sin stock disponible.", "danger")
 
@@ -195,9 +195,9 @@ def actualizar_carrito(id_producto):
                 flash("Producto eliminado del carrito.", "warning")
             elif nueva_cantidad <= producto["cantidad"]:  # Validar stock
                 item["cantidad"] = nueva_cantidad
-                flash("Cantidad actualizada en el carrito.", "info")
+                flash("Cantidad Actualizada en el Carrito.", "info")
             else:
-                flash("Stock insuficiente.", "danger")
+                flash("Stock Insuficiente.", "danger")
             break
 
     session["cart"] = carrito
@@ -211,7 +211,7 @@ def eliminar_carrito(id_producto):
     carrito = session.get("cart", [])
     carrito = [item for item in carrito if item["id_producto"] != id_producto]
     session["cart"] = carrito
-    flash("Producto eliminado del carrito.", "danger")
+    flash("🗑️ Producto Eliminado del Carrito.", "danger")
     return redirect(url_for("carrito"))
 
 
@@ -253,7 +253,7 @@ def finalizar_compra():
     conexion.close()
 
     session["cart"] = []  # Vaciar carrito
-    flash("Compra realizada con éxito. ¡Gracias por tu pedido!", "success")
+    flash("✅ ¡Compra Realizada con Éxito!", "success")
     return redirect(url_for("dashboard"))
 
 # --- Insertar Productos ---
@@ -272,7 +272,7 @@ def crear_producto():
                        (nombre, categoria, cantidad, precio))
         conexion.commit()
         conexion.close()
-        flash("Producto agregado correctamente.", "success")
+        flash("Producto Agregado Correctamente.", "success")
         return redirect(url_for("productos"))
 
     return render_template("crear_producto.html")
@@ -290,21 +290,47 @@ def editar_producto(id_producto):
         cantidad = request.form["cantidad"]
         precio = request.form["precio"]
 
-        cursor.execute("UPDATE productos SET nombre=%s, categoria=%s, cantidad=%s, precio=%s WHERE id_producto=%s",
-                       (nombre, categoria, cantidad, precio, id_producto))
+        cursor.execute(
+            "UPDATE productos SET nombre=%s, categoria=%s, cantidad=%s, precio=%s WHERE id_producto=%s",
+            (nombre, categoria, cantidad, precio, id_producto)
+        )
         conexion.commit()
         conexion.close()
-        flash("Producto actualizado correctamente.", "success")
+        flash("Producto Actualizado Correctamente.", "success")
         return redirect(url_for("productos"))
 
+    # Para GET: obtenemos los datos del producto y mostramos el formulario
+    cursor.execute("SELECT * FROM productos WHERE id_producto=%s", (id_producto,))
+    producto = cursor.fetchone()
+    conexion.close()
+
+    if producto is None:
+        flash("Producto no Encontrado", "error")
+        return redirect(url_for("productos"))
+
+    return render_template("editar_producto.html", producto=producto)
+
+
 @app.route("/actualizar/<int:id_producto>", methods=["POST"])
+@login_required
 def actualizar(id_producto):
     cantidad = int(request.form["cantidad"])
     precio = float(request.form["precio"])
-    inv.actualizar_producto(id_producto, cantidad=cantidad, precio=precio)
-    sincronizar_archivos()
-    flash("✏️ Producto actualizado", "info")
-    return redirect(url_for("productos"))
+
+    conexion = obtener_conexion_mysql()
+    cursor = conexion.cursor()
+
+    cursor.execute(
+        "UPDATE productos SET cantidad=%s, precio=%s WHERE id_producto=%s",
+        (cantidad, precio, id_producto)
+    )
+    conexion.commit()
+    print(f"Filas afectadas: {cursor.rowcount}")
+    conexion.close()
+
+    flash("✏️ Producto Actualizado", "info")
+    return redirect(url_for("dashboard"))
+
 
 
 @app.route("/eliminar/<int:id>", methods=["POST"])
@@ -397,67 +423,163 @@ def dashboard():
     conexion = obtener_conexion_mysql()
     cursor = conexion.cursor(dictionary=True)
 
-    if current_user.rol == "Cliente":
-        # Ver solo sus propias compras
-        cursor.execute("""
-            SELECT v.id_venta, v.fecha, v.total, 
-                   GROUP_CONCAT(CONCAT(p.nombre, ' (', dv.cantidad, ')') SEPARATOR ', ') AS productos
-            FROM ventas v
-            JOIN detalle_ventas dv ON v.id_venta = dv.id_venta
-            JOIN productos p ON dv.id_producto = p.id_producto
-            WHERE v.id_usuario = %s
-            GROUP BY v.id_venta, v.fecha, v.total
-            ORDER BY v.fecha DESC
-        """, (current_user.id,))
-        compras = cursor.fetchall()
-        conexion.close()
-        return render_template("dashboard_cliente.html", compras=compras)
+    if current_user.rol == "Administrador":
+        # Métricas
+        cursor.execute("SELECT COUNT(*) AS total FROM usuarios")
+        total_usuarios = cursor.fetchone()["total"]
 
-    elif current_user.rol == "Empleado":
-        # Ver todas las ventas de todos los clientes
+        cursor.execute("SELECT COUNT(*) AS total FROM productos")
+        total_productos = cursor.fetchone()["total"]
+
+        cursor.execute("SELECT COUNT(*) AS total FROM ventas")
+        total_ventas = cursor.fetchone()["total"]
+
+        cursor.execute("SELECT IFNULL(SUM(total),0) AS ingresos FROM ventas")
+        ingresos = cursor.fetchone()["ingresos"]
+
+        # Usuarios
+        cursor.execute("SELECT * FROM usuarios")
+        usuarios = cursor.fetchall()
+
+        # Productos
+        cursor.execute("SELECT * FROM productos")
+        productos = cursor.fetchall()
+
+        # Ventas
         cursor.execute("""
-            SELECT v.id_venta, v.fecha, v.total, u.nombre AS cliente,
-                   GROUP_CONCAT(CONCAT(p.nombre, ' (', dv.cantidad, ')') SEPARATOR ', ') AS productos
+            SELECT v.id_venta, u.nombre AS cliente, v.fecha, v.total
             FROM ventas v
             JOIN usuarios u ON v.id_usuario = u.id_usuario
-            JOIN detalle_ventas dv ON v.id_venta = dv.id_venta
-            JOIN productos p ON dv.id_producto = p.id_producto
-            GROUP BY v.id_venta, v.fecha, v.total, u.nombre
             ORDER BY v.fecha DESC
         """)
         ventas = cursor.fetchall()
 
-        cursor.execute("SELECT * FROM productos ORDER BY nombre")
+        conexion.close()
+        return render_template(
+            "dashboard_admin.html",
+            data={
+                "usuarios": total_usuarios,
+                "productos": total_productos,
+                "ventas": total_ventas,
+                "ingresos": ingresos,
+            },
+            usuarios=usuarios,     # ✅ se envía al template
+            productos=productos,
+            ventas=ventas
+        )
+
+    elif current_user.rol == "Empleado":
+        # Productos
+        cursor.execute("SELECT * FROM productos")
         productos = cursor.fetchall()
-        conexion.close()
 
-        return render_template("dashboard_empleado.html", ventas=ventas, productos=productos)
-
-    elif current_user.rol == "Administrador":
-        # Resúmenes
-        cursor.execute("SELECT COUNT(*) AS total_usuarios FROM usuarios")
-        total_usuarios = cursor.fetchone()["total_usuarios"]
-
-        cursor.execute("SELECT COUNT(*) AS total_productos FROM productos")
-        total_productos = cursor.fetchone()["total_productos"]
-
-        cursor.execute("SELECT COUNT(*) AS total_ventas, SUM(total) AS ingresos FROM ventas")
-        resumen = cursor.fetchone()
-
-        cursor.execute("SELECT * FROM productos ORDER BY nombre")
-        productos = cursor.fetchall()
+        # Ventas
+        cursor.execute("""
+            SELECT v.id_venta, u.nombre AS cliente, v.fecha, v.total
+            FROM ventas v
+            JOIN usuarios u ON v.id_usuario = u.id_usuario
+            ORDER BY v.fecha DESC
+        """)
+        ventas = cursor.fetchall()
 
         conexion.close()
-        return render_template("dashboard_admin.html",
-                               total_usuarios=total_usuarios,
-                               total_productos=total_productos,
-                               resumen=resumen,
-                               productos=productos)
+        return render_template("dashboard_empleado.html", productos=productos, ventas=ventas)
 
-    else:
+    elif current_user.rol == "Cliente":
+        # Solo sus compras
+        cursor.execute("""
+            SELECT v.id_venta, v.fecha, v.total
+            FROM ventas v
+            WHERE v.id_usuario = %s
+            ORDER BY v.fecha DESC
+        """, (current_user.id,))
+        compras = cursor.fetchall()
+
         conexion.close()
-        flash("Rol no reconocido", "danger")
-        return redirect(url_for("index"))
+        return render_template("dashboard_cliente.html", compras=compras)
+
+    conexion.close()
+    return redirect(url_for("index"))
+
+
+# ------------------ Eliminar Usuario ------------------
+@app.route("/eliminar_usuario/<int:id_usuario>", methods=["POST"])
+@login_required
+def eliminar_usuario(id_usuario):
+    if current_user.rol != "Administrador":
+        flash("No tienes permiso para realizar esta acción.", "danger")
+        return redirect(url_for("dashboard"))
+
+    conexion = obtener_conexion_mysql()
+    cursor = conexion.cursor()
+
+    cursor.execute("DELETE FROM usuarios WHERE id_usuario = %s", (id_usuario,))
+    conexion.commit()
+    conexion.close()
+
+    flash("🗑️ Usuario Eliminado Correctamente.", "success")
+    return redirect(url_for("dashboard"))
+
+
+# --- Ver detalle de una venta ---
+@app.route("/detalle_venta/<int:id_venta>")
+@login_required
+def detalle_venta(id_venta):
+    conexion = obtener_conexion_mysql()
+    cursor = conexion.cursor(dictionary=True)
+
+    # Obtener la venta
+    cursor.execute("""
+        SELECT v.id_venta, v.fecha, v.total, u.nombre AS cliente
+        FROM ventas v
+        JOIN usuarios u ON v.id_usuario = u.id_usuario
+        WHERE v.id_venta = %s
+    """, (id_venta,))
+    venta = cursor.fetchone()
+
+    if not venta:
+        conexion.close()
+        flash("Venta no encontrada.", "danger")
+        return redirect(url_for("dashboard"))
+
+    # Obtener los productos de la venta
+    cursor.execute("""
+        SELECT dv.id_producto, p.nombre, dv.cantidad, dv.subtotal AS precio_unitario 
+
+
+        FROM detalle_ventas dv
+        JOIN productos p ON dv.id_producto = p.id_producto
+        WHERE dv.id_venta = %s
+    """, (id_venta,))
+    detalles = cursor.fetchall()
+
+    conexion.close()
+    return render_template("detalle_venta.html", venta=venta, detalles=detalles)
+# --- Eliminar venta ---
+@app.route("/eliminar_venta/<int:id_venta>", methods=["POST", "GET"])
+@login_required
+def eliminar_venta(id_venta):
+    # Solo admin puede eliminar
+    if current_user.rol != "Administrador":
+        flash("No tienes permisos para eliminar ventas.", "danger")
+        return redirect(url_for("dashboard"))
+
+    conexion = obtener_conexion_mysql()
+    cursor = conexion.cursor()
+
+    try:
+        # Primero borrar los detalles de la venta
+        cursor.execute("DELETE FROM detalle_ventas WHERE id_venta = %s", (id_venta,))
+        # Luego borrar la venta
+        cursor.execute("DELETE FROM ventas WHERE id_venta = %s", (id_venta,))
+        conexion.commit()
+        flash("Venta eliminada correctamente.", "success")
+    except Exception as e:
+        flash(f"Error al eliminar la venta: {e}", "danger")
+    finally:
+        conexion.close()
+
+    return redirect(url_for("dashboard"))
 
 
 # ------------------ TEST DB ------------------

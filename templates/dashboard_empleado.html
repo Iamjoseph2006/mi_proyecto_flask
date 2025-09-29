@@ -1,42 +1,132 @@
 {% extends "base.html" %}
-{% block title %}Dashboard Empleado{% endblock %}
+{% block title %}Empleado{% endblock %}
 {% block content %}
 
-<!-- MENSAJES FLASH COMPACTOS -->
-<div class="container mt-3" style="max-width: 400px; margin-left: auto; margin-right: auto;">
+<!-- MENSAJES FLASH -->
+<div class="container mt-3" style="max-width: 400px; margin: auto;">
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show py-2" role="alert" style="font-size: 0.9rem;">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.5rem;"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show py-2" role="alert" style="font-size: 0.9rem;">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.5rem;"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
     {% endwith %}
 </div>
 
-<section id="productos" class="container my-5 text-center">
-    <h2 class="section-title">Panel de Empleado</h2>
-    
-    <h4 class="mt-4">Productos en Inventario</h4>
+<div class="container mt-3">
+    <h2 class="section-title text-center">Panel de Empleado</h2>
+    <h3>Bienvenido/a, {{ current_user.nombre }} 👋</h3>
+
+    <!-- Botón crear producto -->
+    <div class="text-end my-3">
+        <a href="{{ url_for('crear_producto') }}" class="btn btn-success">➕ Crear Producto</a>
+    </div>
+
+    <!-- ==================== VARIABLES DE PAGINACIÓN ==================== -->
+    {% set pagina_prod = request.args.get('pagina_prod', 1)|int %}
+    {% set por_pagina_prod = 5 %}
+    {% set inicio_prod = (pagina_prod - 1) * por_pagina_prod %}
+    {% set fin_prod = inicio_prod + por_pagina_prod %}
+    {% set productos_paginados = productos[inicio_prod:fin_prod] %}
+    {% set total_paginas_prod = (productos|length // por_pagina_prod) + (1 if productos|length % por_pagina_prod > 0 else 0) %}
+
+    {% set pagina_ventas = request.args.get('pagina_ventas', 1)|int %}
+    {% set por_pagina_ventas = 5 %}
+    {% set inicio_ventas = (pagina_ventas - 1) * por_pagina_ventas %}
+    {% set fin_ventas = inicio_ventas + por_pagina_ventas %}
+    {% set ventas_paginadas = ventas[inicio_ventas:fin_ventas] %}
+    {% set total_paginas_ventas = (ventas|length // por_pagina_ventas) + (1 if ventas|length % por_pagina_ventas > 0 else 0) %}
+
+    <!-- ==================== TABLA PRODUCTOS ==================== -->
+    <h4>Productos en Inventario</h4>
     <table class="table table-striped mt-3">
         <thead>
             <tr>
-                <th>ID</th><th>Nombre</th><th>Categoría</th><th>Cantidad</th><th>Precio</th>
+                <th>ID</th><th>Nombre</th><th>Categoría</th><th>Cantidad</th><th>Precio</th><th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            {% for p in data.productos %}
+            {% for p in productos_paginados %}
             <tr>
                 <td>{{ p.id_producto }}</td>
                 <td>{{ p.nombre }}</td>
                 <td>{{ p.categoria }}</td>
                 <td>{{ p.cantidad }}</td>
                 <td>${{ "%.2f"|format(p.precio) }}</td>
+                <td>
+                    <a href="{{ url_for('editar_producto', id_producto=p.id_producto) }}" class="btn btn-sm btn-primary">✏️ Editar</a>
+                    <form method="POST" action="{{ url_for('eliminar_producto', id=p.id_producto) }}" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este producto?');">🗑 Eliminar</button>
+                    </form>
+                </td>
             </tr>
+            {% else %}
+            <tr><td colspan="6">No hay productos disponibles.</td></tr>
             {% endfor %}
         </tbody>
     </table>
-</section>
+
+    <!-- Paginación Productos -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {% if pagina_prod == 1 %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('dashboard', pagina_prod=pagina_prod-1, pagina_ventas=pagina_ventas) }}">Anterior</a>
+            </li>
+            {% for num in range(1, total_paginas_prod+1) %}
+            <li class="page-item {% if num == pagina_prod %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('dashboard', pagina_prod=num, pagina_ventas=pagina_ventas) }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+            <li class="page-item {% if pagina_prod == total_paginas_prod %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('dashboard', pagina_prod=pagina_prod+1, pagina_ventas=pagina_ventas) }}">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- ==================== TABLA VENTAS ==================== -->
+    <h4 class="mt-5">Ventas Realizadas</h4>
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>ID Venta</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for v in ventas_paginadas %}
+            <tr>
+                <td>{{ v.id_venta }}</td>
+                <td>{{ v.cliente }}</td>
+                <td>{{ v.fecha }}</td>
+                <td>${{ "%.2f"|format(v.total) }}</td>
+                <td>
+                    <a href="{{ url_for('detalle_venta', id_venta=v.id_venta) }}" class="btn btn-sm btn-info">👁 Ver</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">No hay ventas registradas.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Paginación Ventas -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {% if pagina_ventas == 1 %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('dashboard', pagina_prod=pagina_prod, pagina_ventas=pagina_ventas-1) }}">Anterior</a>
+            </li>
+            {% for num in range(1, total_paginas_ventas+1) %}
+            <li class="page-item {% if num == pagina_ventas %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('dashboard', pagina_prod=pagina_prod, pagina_ventas=num) }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+            <li class="page-item {% if pagina_ventas == total_paginas_ventas %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('dashboard', pagina_prod=pagina_prod, pagina_ventas=pagina_ventas+1) }}">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+
+</div>
 {% endblock %}

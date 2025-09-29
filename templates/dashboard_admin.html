@@ -1,48 +1,175 @@
 {% extends "base.html" %}
-{% block title %}Dashboard Admin{% endblock %}
+{% block title %}Administrador{% endblock %}
 {% block content %}
 
-<!-- MENSAJES FLASH COMPACTOS -->
-<div class="container mt-3" style="max-width: 400px; margin-left: auto; margin-right: auto;">
+<!-- MENSAJES FLASH -->
+<div class="container mt-3" style="max-width: 400px; margin:auto;">
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show py-2" role="alert" style="font-size: 0.9rem;">
+                <div class="alert alert-{{ category }} alert-dismissible fade show py-2" role="alert" style="font-size:0.9rem;">
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.5rem;"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding:0.5rem;"></button>
                 </div>
             {% endfor %}
         {% endif %}
     {% endwith %}
 </div>
 
-<section id="productos" class="container my-5 text-center">
-    <h2 class="section-title">Panel de Administración</h2>
+<div class="container mt-3">
+    <h2 class="section-title text-center">Panel de Administración</h2>
+    <h3>Bienvenido/a, {{ current_user.nombre }} 👋</h3>
+
+    <!-- Métricas -->
     <div class="row text-center mt-4">
-        <div class="col-md-3">
-            <div class="card p-3 bg-light shadow-sm">
-                <h4>Usuarios</h4>
-                <p class="fs-4">{{ data.usuarios }}</p>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card p-3 bg-light shadow-sm">
-                <h4>Productos</h4>
-                <p class="fs-4">{{ data.productos }}</p>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card p-3 bg-light shadow-sm">
-                <h4>Ventas</h4>
-                <p class="fs-4">{{ data.ventas }}</p>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card p-3 bg-light shadow-sm">
-                <h4>Ingresos</h4>
-                <p class="fs-4">${{ "%.2f"|format(data.ingresos) }}</p>
-            </div>
-        </div>
+        <div class="col-md-3"><div class="card p-3 bg-light shadow-sm"><h4>Usuarios</h4><p class="fs-4">{{ data.usuarios }}</p></div></div>
+        <div class="col-md-3"><div class="card p-3 bg-light shadow-sm"><h4>Productos</h4><p class="fs-4">{{ data.productos }}</p></div></div>
+        <div class="col-md-3"><div class="card p-3 bg-light shadow-sm"><h4>Ventas</h4><p class="fs-4">{{ data.ventas }}</p></div></div>
+        <div class="col-md-3"><div class="card p-3 bg-light shadow-sm"><h4>Ingresos</h4><p class="fs-4">${{ "%.2f"|format(data.ingresos) }}</p></div></div>
     </div>
-</section>
+
+    {% set por_pagina = 5 %}
+
+    <!-- ===================== USUARIOS ===================== -->
+    {% set pagina_usuarios = request.args.get('pagina_usuarios', 1)|int %}
+    {% set inicio_u = (pagina_usuarios - 1) * por_pagina %}
+    {% set fin_u = inicio_u + por_pagina %}
+    {% set usuarios_paginados = usuarios[inicio_u:fin_u] %}
+    {% set total_paginas_usuarios = (usuarios|length // por_pagina) + (1 if usuarios|length % por_pagina > 0 else 0) %}
+
+    <h2 class="section-title mt-4">Usuarios Registrados</h2>
+    <table class="table table-striped mt-3">
+        <thead><tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Rol</th><th>Acciones</th></tr></thead>
+        <tbody>
+            {% for u in usuarios_paginados %}
+            <tr>
+                <td>{{ u.id_usuario }}</td>
+                <td>{{ u.nombre }}</td>
+                <td>{{ u.mail }}</td>
+                <td>{{ u.rol }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('eliminar_usuario', id_usuario=u.id_usuario) }}" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este usuario?');">🗑 Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">No hay usuarios registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Paginación Usuarios -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {% if pagina_usuarios == 1 %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for(request.endpoint, pagina_usuarios=pagina_usuarios-1, pagina_productos=request.args.get('pagina_productos',1), pagina_ventas=request.args.get('pagina_ventas',1)) }}">Anterior</a>
+            </li>
+            {% for p in range(1, total_paginas_usuarios + 1) %}
+            <li class="page-item {% if p == pagina_usuarios %}active{% endif %}">
+                <a class="page-link" href="{{ url_for(request.endpoint, pagina_usuarios=p, pagina_productos=request.args.get('pagina_productos',1), pagina_ventas=request.args.get('pagina_ventas',1)) }}">{{ p }}</a>
+            </li>
+            {% endfor %}
+            <li class="page-item {% if pagina_usuarios == total_paginas_usuarios %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for(request.endpoint, pagina_usuarios=pagina_usuarios+1, pagina_productos=request.args.get('pagina_productos',1), pagina_ventas=request.args.get('pagina_ventas',1)) }}">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- ===================== PRODUCTOS ===================== -->
+    {% set pagina_productos = request.args.get('pagina_productos',1)|int %}
+    {% set inicio_p = (pagina_productos - 1) * por_pagina %}
+    {% set fin_p = inicio_p + por_pagina %}
+    {% set productos_paginados = productos[inicio_p:fin_p] %}
+    {% set total_paginas_productos = (productos|length // por_pagina) + (1 if productos|length % por_pagina > 0 else 0) %}
+
+    <h2 class="section-title mt-4">Productos en Inventario</h2>
+    <table class="table table-striped mt-3">
+        <thead><tr><th>ID</th><th>Nombre</th><th>Categoría</th><th>Cantidad</th><th>Precio</th><th>Acciones</th></tr></thead>
+        <tbody>
+            {% for p in productos_paginados %}
+            <tr>
+                <td>{{ p.id_producto }}</td>
+                <td>{{ p.nombre }}</td>
+                <td>{{ p.categoria }}</td>
+                <td>{{ p.cantidad }}</td>
+                <td>${{ "%.2f"|format(p.precio) }}</td>
+                <td>
+                    <a href="{{ url_for('editar_producto', id_producto=p.id_producto) }}" class="btn btn-sm btn-primary">✏️ Editar</a>
+                    <form method="POST" action="{{ url_for('eliminar_producto', id=p.id_producto) }}" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este producto?');">🗑 Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6">No hay productos disponibles.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Paginación Productos -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {% if pagina_productos == 1 %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for(request.endpoint, pagina_productos=pagina_productos-1, pagina_usuarios=pagina_usuarios, pagina_ventas=request.args.get('pagina_ventas',1)) }}">Anterior</a>
+            </li>
+            {% for p in range(1, total_paginas_productos + 1) %}
+            <li class="page-item {% if p == pagina_productos %}active{% endif %}">
+                <a class="page-link" href="{{ url_for(request.endpoint, pagina_productos=p, pagina_usuarios=pagina_usuarios, pagina_ventas=request.args.get('pagina_ventas',1)) }}">{{ p }}</a>
+            </li>
+            {% endfor %}
+            <li class="page-item {% if pagina_productos == total_paginas_productos %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for(request.endpoint, pagina_productos=pagina_productos+1, pagina_usuarios=pagina_usuarios, pagina_ventas=request.args.get('pagina_ventas',1)) }}">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- ===================== VENTAS ===================== -->
+    {% set pagina_ventas = request.args.get('pagina_ventas',1)|int %}
+    {% set inicio_v = (pagina_ventas - 1) * por_pagina %}
+    {% set fin_v = inicio_v + por_pagina %}
+    {% set ventas_paginadas = ventas[inicio_v:fin_v] %}
+    {% set total_paginas_ventas = (ventas|length // por_pagina) + (1 if ventas|length % por_pagina > 0 else 0) %}
+
+    <h2 class="section-title mt-4">Ventas Realizadas</h2>
+    <table class="table table-bordered mt-3">
+        <thead><tr><th>ID Venta</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Acciones</th></tr></thead>
+        <tbody>
+            {% for v in ventas_paginadas %}
+            <tr>
+                <td>{{ v.id_venta }}</td>
+                <td>{{ v.cliente }}</td>
+                <td>{{ v.fecha }}</td>
+                <td>${{ "%.2f"|format(v.total) }}</td>
+                <td>
+                    <a href="{{ url_for('detalle_venta', id_venta=v.id_venta) }}" class="btn btn-sm btn-info">👁 Ver</a>
+                    <form method="POST" action="{{ url_for('eliminar_venta', id_venta=v.id_venta) }}" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar esta venta?');">🗑 Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">No hay ventas registradas.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Paginación Ventas -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {% if pagina_ventas == 1 %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for(request.endpoint, pagina_ventas=pagina_ventas-1, pagina_productos=pagina_productos, pagina_usuarios=pagina_usuarios) }}">Anterior</a>
+            </li>
+            {% for p in range(1, total_paginas_ventas + 1) %}
+            <li class="page-item {% if p == pagina_ventas %}active{% endif %}">
+                <a class="page-link" href="{{ url_for(request.endpoint, pagina_ventas=p, pagina_productos=pagina_productos, pagina_usuarios=pagina_usuarios) }}">{{ p }}</a>
+            </li>
+            {% endfor %}
+            <li class="page-item {% if pagina_ventas == total_paginas_ventas %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for(request.endpoint, pagina_ventas=pagina_ventas+1, pagina_productos=pagina_productos, pagina_usuarios=pagina_usuarios) }}">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+
+</div>
 {% endblock %}

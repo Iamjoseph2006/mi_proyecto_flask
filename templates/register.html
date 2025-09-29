@@ -1,23 +1,39 @@
 {% extends "base.html" %}
+{% block title %}Registro - Sweet Spot{% endblock %}
 
 {% block content %}
+
+<!-- MENSAJES FLASH COMPACTOS -->
+<div class="container mt-3" style="max-width: 400px; margin-left: auto; margin-right: auto;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show py-2" role="alert" style="font-size: 0.9rem;">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.5rem;"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
 <section id="register" class="container mb-5 text-center">
     <h2 class="section-title">Registro de Usuario</h2>
     <form method="POST" class="mx-auto contacto-form" style="max-width:400px;">
         <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre:</label>
-            <input type="text" name="nombre" class="form-control" placeholder="Nombre" required>
+            <label for="nombre" class="form-label">Escriba su Nombre Completo:</label>
+            <input type="text" name="nombre" class="form-control" placeholder="Nombres y Apellidos" required>
         </div>
         <div class="mb-3">
-            <label for="mail" class="form-label">Correo Electrónico:</label>
-            <input type="email" name="mail" class="form-control" placeholder="Correo" required>
+            <label for="mail" class="form-label">Ingresar un Correo Electrónico:</label>
+            <input type="email" name="mail" class="form-control" placeholder="Correo Electrónico" required>
         </div>
         <div class="mb-3">
-            <label for="password" class="form-label">Contraseña:</label>
+            <label for="password" class="form-label">Ingresar una Contraseña:</label>
             <input type="password" name="password" class="form-control" placeholder="Contraseña" required>
         </div>
         <div class="mb-3">
-            <label for="rol" class="form-label">Rol:</label>
+            <label for="rol" class="form-label">Elja un Rol:</label>
             <select name="rol" class="form-control" required>
                 <option value="Cliente">Cliente</option>
                 <option value="Empleado">Empleado</option>

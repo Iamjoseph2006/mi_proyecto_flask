@@ -2,8 +2,25 @@
 {% block title %}Carrito - Sweet Spot{% endblock %}
 
 {% block content %}
+
+<!-- MENSAJES FLASH COMPACTOS -->
+<div class="container mt-3" style="max-width: 400px; margin-left: auto; margin-right: auto;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show py-2" role="alert" style="font-size: 0.9rem;">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+            style="padding: 0.5rem;"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
+
 <section id="productos" class="container my-5 text-center">
     <h2 class="section-title">Carrito de Compras</h2>
+
     {% if carrito %}
     <table class="table table-bordered mt-4">
         <thead>
@@ -12,27 +29,47 @@
                 <th>Cantidad</th>
                 <th>Precio Unitario</th>
                 <th>Subtotal</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             {% for item in carrito %}
             <tr>
                 <td>{{ item.nombre }}</td>
-                <td>{{ item.cantidad }}</td>
+
+                <!-- FORMULARIO PARA ACTUALIZAR CANTIDAD -->
+                <td>
+                    <form action="{{ url_for('actualizar_carrito', id_producto=item.id_producto) }}" method="POST"
+                        class="d-flex justify-content-center">
+                        <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1"
+                            class="form-control form-control-sm cantidad-input" style="width: 60px;">
+                    </form>
+                </td>
+
                 <td>${{ "%.2f"|format(item.precio) }}</td>
                 <td>${{ "%.2f"|format(item.precio * item.cantidad) }}</td>
+
+                <!-- BOTÓN ELIMINAR -->
+                <td>
+                    <a href="{{ url_for('eliminar_carrito', id_producto=item.id_producto) }}"
+                        class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este producto del carrito?');">
+                        Eliminar <i class="bi bi-trash-fill"></i>
+                    </a>
+                </td>
+
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
     <h4 class="text-end">Total: ${{ "%.2f"|format(total) }}</h4>
 
-    <form method="POST" action="{{ url_for('finalizar_compra') }}">
-        <div class="text-center mt-4">
+    <div class="text-center mt-4">
+        <a href="{{ url_for('productos_tienda') }}" class="btn btn-secondary">Seguir Comprando</a>
+        <form method="POST" action="{{ url_for('finalizar_compra') }}" style="display:inline;">
             <button type="submit" class="btn btn-success">Finalizar Compra</button>
-            <a href="{{ url_for('productos_tienda') }}" class="btn btn-secondary">Seguir Comprando</a>
-        </div>
-    </form>
+        </form>
+    </div>
 
     {% else %}
     <p class="text-center mt-4">Tu carrito está vacío.</p>

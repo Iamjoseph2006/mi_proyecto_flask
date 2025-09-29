@@ -1,31 +1,43 @@
 {% extends "base.html" %}
-{% block title %}Dashboard Cliente{% endblock %}
+{% block title %}Cliente{% endblock %}
 {% block content %}
 
 <!-- MENSAJES FLASH COMPACTOS -->
 <div class="container mt-3" style="max-width: 400px; margin-left: auto; margin-right: auto;">
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show py-2" role="alert" style="font-size: 0.9rem;">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.5rem;"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show py-2" role="alert" style="font-size: 0.9rem;">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+            style="padding: 0.5rem;"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
     {% endwith %}
 </div>
 
 <section id="productos" class="container my-5 text-center">
     <h2 class="section-title">Mis Compras</h2>
+    <h3>Bienvenido/a, {{ current_user.nombre }} 👋</h3>
+
+    {% set pagina = request.args.get('pagina', 1)|int %}
+    {% set por_pagina = 5 %}
+    {% set inicio = (pagina - 1) * por_pagina %}
+    {% set fin = inicio + por_pagina %}
+    {% set compras_paginadas = compras[inicio:fin] %}
+    {% set total_paginas = (compras|length // por_pagina) + (1 if compras|length % por_pagina > 0 else 0) %}
+
     <table class="table table-striped mt-4">
         <thead>
             <tr>
-                <th>ID Venta</th><th>Fecha</th><th>Total</th>
+                <th>ID Venta</th>
+                <th>Fecha</th>
+                <th>Total</th>
             </tr>
         </thead>
         <tbody>
-            {% for c in data.compras %}
+            {% for c in compras_paginadas %}
             <tr>
                 <td>{{ c.id_venta }}</td>
                 <td>{{ c.fecha }}</td>
@@ -38,5 +50,22 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Paginación Bootstrap -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {% if pagina == 1 %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('dashboard', pagina=pagina-1) }}">Anterior</a>
+            </li>
+            {% for num in range(1, total_paginas+1) %}
+            <li class="page-item {% if num == pagina %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('dashboard', pagina=num) }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+            <li class="page-item {% if pagina == total_paginas %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('dashboard', pagina=pagina+1) }}">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
 </section>
 {% endblock %}
