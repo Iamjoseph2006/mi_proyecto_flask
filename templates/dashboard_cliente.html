@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Cliente{% endblock %}
+{% block content %}
+
+<!-- MENSAJES FLASH COMPACTOS -->
+<div class="container mt-3" style="max-width: 400px; margin-left: auto; margin-right: auto;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show py-2" role="alert" style="font-size: 0.9rem;">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.5rem;"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+<section id="productos" class="container my-5 text-center">
+    <h2 class="section-title">Mis Compras</h2>
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr>
+                <th>ID Venta</th><th>Fecha</th><th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in data.compras %}
+            <tr>
+                <td>{{ c.id_venta }}</td>
+                <td>{{ c.fecha }}</td>
+                <td>${{ "%.2f"|format(c.total) }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3" class="text-center">No tienes compras registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

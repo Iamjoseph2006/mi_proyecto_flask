@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Admin{% endblock %}
+{% block content %}
+
+<!-- MENSAJES FLASH COMPACTOS -->
+<div class="container mt-3" style="max-width: 400px; margin-left: auto; margin-right: auto;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show py-2" role="alert" style="font-size: 0.9rem;">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.5rem;"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+<section id="productos" class="container my-5 text-center">
+    <h2 class="section-title">Panel de Administración</h2>
+    <div class="row text-center mt-4">
+        <div class="col-md-3">
+            <div class="card p-3 bg-light shadow-sm">
+                <h4>Usuarios</h4>
+                <p class="fs-4">{{ data.usuarios }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 bg-light shadow-sm">
+                <h4>Productos</h4>
+                <p class="fs-4">{{ data.productos }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 bg-light shadow-sm">
+                <h4>Ventas</h4>
+                <p class="fs-4">{{ data.ventas }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 bg-light shadow-sm">
+                <h4>Ingresos</h4>
+                <p class="fs-4">${{ "%.2f"|format(data.ingresos) }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

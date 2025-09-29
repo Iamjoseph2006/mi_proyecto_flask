@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Inventario - Sweet Spot{% endblock %}
+
+{% block content %}
+<section class="container my-5 text-center">
+    <h2 class="section-title">Editar Producto</h2>
+    <form method="POST" action="{{ url_for('actualizar', id_producto=producto.id_producto) }}" class="mx-auto contacto-form" style="max-width: 600px;">
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre:</label>
+            <input type="text" class="form-control" name="nombre" value="{{ producto.nombre }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="categoria" class="form-label">Categoría:</label>
+            <input type="text" class="form-control" name="categoria" value="{{ producto.categoria }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="cantidad" class="form-label">Cantidad:</label>
+            <input type="number" class="form-control" name="cantidad" value="{{ producto.cantidad }}" min="0" required>
+        </div>
+        <div class="mb-3">
+            <label for="precio" class="form-label">Precio:</label>
+            <input type="number" class="form-control" step="0.01" name="precio" value="{{ producto.precio }}" min="0" required>
+        </div>
+        <button type="submit" class="btn btn-outline-acento">💾 Guardar cambios</button>
+    </form>
+</section>
+{% endblock %}

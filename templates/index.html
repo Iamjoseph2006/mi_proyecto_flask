@@ -30,30 +30,30 @@
 <section id="productos" class="container my-5 text-center">
     <h2 class="section-title">Nuestros Productos</h2>
     <div class="table-responsive d-flex justify-content-center">
-        <table class="table table-bordered table-striped table-sm productos-tabla">
+        <table class="table table-bordered table-striped table-sm productos-tabla mx-auto">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th>ID</th>
                     <th>Producto</th>
+                    <th>Categoría</th>
+                    <th>Cantidad</th>
                     <th>Precio</th>
                 </tr>
             </thead>
             <tbody>
+                {% for prod in productos %}
                 <tr>
-                    <td>1</td>
-                    <td>Manicho de Chocolate</td>
-                    <td>$0.75</td>
+                    <td>{{ prod.id_producto }}</td>
+                    <td>{{ prod.nombre }}</td>
+                    <td>{{ prod.categoria }}</td>
+                    <td>{{ prod.cantidad }}</td>
+                    <td>${{ "%.2f"|format(prod.precio) }}</td>
                 </tr>
+                {% else %}
                 <tr>
-                    <td>2</td>
-                    <td>Helado Artesanal</td>
-                    <td>$0.25</td>
+                    <td colspan="6" class="text-center">No hay productos registrados.</td>
                 </tr>
-                <tr>
-                    <td>3</td>
-                    <td>Galleta Oreo</td>
-                    <td>$0.50</td>
-                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -64,15 +64,15 @@
     <h2 class="section-title">Contáctanos</h2>
     <form id="formularioContacto" class="mx-auto contacto-form">
         <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre:</label>
+            <label for="nombre" class="form-label">Ingresar un Nombre:</label>
             <input type="text" class="form-control" id="nombre" required>
         </div>
         <div class="mb-3">
-            <label for="correo" class="form-label">Correo:</label>
+            <label for="correo" class="form-label">Ingresar un Correo:</label>
             <input type="email" class="form-control" id="correo" required>
         </div>
         <div class="mb-3">
-            <label for="mensaje" class="form-label">Mensaje:</label>
+            <label for="mensaje" class="form-label">Escribe tu Mensaje:</label>
             <textarea class="form-control" id="mensaje" rows="3" required></textarea>
         </div>
         <button type="submit" class="btn btn-outline-acento">Enviar</button>

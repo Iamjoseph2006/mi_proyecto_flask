@@ -1,89 +1,47 @@
 {% extends "base.html" %}
 
-{% block title %}Inventario - Sweet Spot{% endblock %}
+{% block title %}Tienda - Sweet Spot{% endblock %}
 
 {% block content %}
-<section class="container my-5 text-center">
-    <h2 class="section-title">Inventario de Productos</h2>
 
-    <!-- Formulario para agregar -->
-    <form method="POST" id="formularioContacto" class="mx-auto contacto-form">
-        <div class="mb-3">
-            <label for="nombre" class="form-label">Ingrese el Nombre del Producto:</label>
-            <input type="text" class="form-control" name="nombre" placeholder="Producto" required>
-        </div>
-        <div class="mb-3">
-            <label for="cantidad" class="form-label">Ingrese la Cantidad:</label>
-            <input type="number" class="form-control" name="cantidad" placeholder="Cantidad" required>
-        </div>
-        <div class="mb-3">
-            <label for="precio" class="form-label">Ingrese el Precio:</label>
-            <input type="number" class="form-control" step="0.01" name="precio" placeholder="Precio" required>
-        </div>
-        <button type="submit" name="add" class="btn btn-outline-acento">Agregar</button>
-    </form>
+<!-- MENSAJES FLASH COMPACTOS -->
+<div class="container mt-3" style="max-width: 400px; margin-left: auto; margin-right: auto;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show py-2" role="alert" style="font-size: 0.9rem;">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.5rem;"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
 
-    <!-- Formulario de búsqueda -->
-    <section id="productos" class="container my-5 text-center">
-        <h2 class="section-title">Búsqueda de Productos</h2>
-        <form method="GET" action="{{ url_for('productos') }}" class="mt-4">
-            <div class="input-group mx-auto" style="max-width: 500px;">
-                <input type="text" name="buscar" class="form-control" placeholder="Buscar producto por nombre">
-                <button type="submit" class="btn btn-outline-acento">Buscar</button>
+<section id="productos" class="container my-5 text-center">
+    <h2 class="section-title">Tienda de Productos</h2>
+    <div class="row mt-4">
+        {% for prod in productos %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ prod.nombre }}</h5>
+                    <p class="card-text">Categoría: {{ prod.categoria }}</p>
+                    <p class="card-text">Stock: {{ prod.cantidad }}</p>
+                    <p class="card-text text-success fw-bold">${{ "%.2f"|format(prod.precio) }}</p>
+                    <a href="{{ url_for('agregar_carrito', id_producto=prod.id_producto) }}"
+                       class="btn btn-outline-acento">Agregar al carrito</a>
+                </div>
             </div>
-        </form>
-    </section>
-
-    <!-- Tabla de productos -->
-    <section id="productos" class="container my-5 text-center">
-        <h2 class="section-title">Nuestros Productos</h2>
-        <div class="table-responsive d-flex justify-content-center">
-            <table class="table table-bordered table-striped table-sm productos-tabla mx-auto">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Producto</th>
-                        <th>Cantidad</th>
-                        <th>Precio</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for prod in productos %}
-                    <tr>
-                        <td>{{ loop.index }}</td>
-                        <td>{{ prod.nombre }}</td>
-                        <td>{{ prod.cantidad }}</td>
-                        <td>${{ "%.2f"|format(prod.precio) }}</td>
-                        <td>
-                            <!-- Botón Editar -->
-                            <a href="{{ url_for('editar', id_producto=prod.id_producto) }}"
-                                class="btn btn-outline-primary btn-sm">Editar</a>
-
-                            <!-- Botón Eliminar con confirmación -->
-                            <a href="{{ url_for('eliminar', id_producto=prod.id_producto) }}"
-                                class="btn btn-outline-danger btn-sm"
-                                onclick="return confirm('¿Estás seguro de eliminar este producto?');">
-                                Eliminar
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
         </div>
-    </section>
+        {% else %}
+        <p class="text-center">No hay productos disponibles.</p>
+        {% endfor %}
+    </div>
 
-    <!-- Botones de visualización en TXT, JSON y CSV -->
-    <section id="archivos-productos" class="container my-4 text-center">
-        <h3 class="section-title">Ver Productos en Archivos TXT, JSON y CSV</h3>
-        <div class="d-flex justify-content-center gap-3 mt-3 flex-wrap">
-            <a href="{{ url_for('productos_txt') }}" class="btn btn-outline-primary">Ver TXT</a>
-            <a href="{{ url_for('productos_json') }}" class="btn btn-outline-success">Ver JSON</a>
-            <a href="{{ url_for('productos_csv') }}" class="btn btn-outline-info">Ver CSV</a>
-        </div>
-    </section>
-
-
+    <!-- Ver carrito -->
+    <div class="text-center mt-4">
+        <a href="{{ url_for('carrito') }}" class="btn btn-primary">Ver Carrito</a>
+    </div>
 </section>
 {% endblock %}

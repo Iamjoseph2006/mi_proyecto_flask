@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Empleado{% endblock %}
+{% block content %}
+
+<!-- MENSAJES FLASH COMPACTOS -->
+<div class="container mt-3" style="max-width: 400px; margin-left: auto; margin-right: auto;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show py-2" role="alert" style="font-size: 0.9rem;">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.5rem;"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+<section id="productos" class="container my-5 text-center">
+    <h2 class="section-title">Panel de Empleado</h2>
+    
+    <h4 class="mt-4">Productos en Inventario</h4>
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>ID</th><th>Nombre</th><th>Categoría</th><th>Cantidad</th><th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in data.productos %}
+            <tr>
+                <td>{{ p.id_producto }}</td>
+                <td>{{ p.nombre }}</td>
+                <td>{{ p.categoria }}</td>
+                <td>{{ p.cantidad }}</td>
+                <td>${{ "%.2f"|format(p.precio) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

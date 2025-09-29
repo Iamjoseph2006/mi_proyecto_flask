@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Carrito - Sweet Spot{% endblock %}
+
+{% block content %}
+<section id="productos" class="container my-5 text-center">
+    <h2 class="section-title">Carrito de Compras</h2>
+    {% if carrito %}
+    <table class="table table-bordered mt-4">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in carrito %}
+            <tr>
+                <td>{{ item.nombre }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td>${{ "%.2f"|format(item.precio) }}</td>
+                <td>${{ "%.2f"|format(item.precio * item.cantidad) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h4 class="text-end">Total: ${{ "%.2f"|format(total) }}</h4>
+
+    <form method="POST" action="{{ url_for('finalizar_compra') }}">
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success">Finalizar Compra</button>
+            <a href="{{ url_for('productos_tienda') }}" class="btn btn-secondary">Seguir Comprando</a>
+        </div>
+    </form>
+
+    {% else %}
+    <p class="text-center mt-4">Tu carrito está vacío.</p>
+    {% endif %}
+</section>
+{% endblock %}
