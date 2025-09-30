@@ -41,19 +41,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for prod in productos %}
-                <tr>
-                    <td>{{ prod.id_producto }}</td>
-                    <td>{{ prod.nombre }}</td>
-                    <td>{{ prod.categoria }}</td>
-                    <td>{{ prod.cantidad }}</td>
-                    <td>${{ "%.2f"|format(prod.precio) }}</td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="6" class="text-center">No hay productos registrados.</td>
-                </tr>
-                {% endfor %}
+
             </tbody>
         </table>
     </div>
