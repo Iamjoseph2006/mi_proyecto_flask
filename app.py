@@ -96,12 +96,8 @@ def leer_csv():
 # ------------------ RUTAS PÁGINAS ------------------
 @app.route("/")
 def index():
-    conexion = obtener_conexion_mysql()
-    cursor = conexion.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM productos")
-    productos = cursor.fetchall()
-    conexion.close()
-    return render_template("index.html", productos=productos)
+
+    return render_template("index.html")
 
 @app.route("/about")
 def about():
