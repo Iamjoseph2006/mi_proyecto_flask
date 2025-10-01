@@ -120,7 +120,7 @@ def init_cart():
 def productos_tienda():
     conexion = obtener_conexion_mysql()
     cursor = conexion.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM productos WHERE cantidad > 0")
+    cursor.execute("SELECT * FROM productos WHERE activo = 1 AND cantidad > 0")
     productos = cursor.fetchall()
     conexion.close()
     return render_template("productos.html", productos=productos)
@@ -192,7 +192,7 @@ def actualizar_carrito(id_producto):
         if item["id_producto"] == id_producto:
             if nueva_cantidad <= 0:
                 carrito.remove(item)  # Eliminar si es 0
-                flash("🗑️ Producto eliminado del carrito.", "warning")
+                flash("🗑️ Producto Eliminado del Carrito.", "warning")
             elif nueva_cantidad <= producto["cantidad"]:  # Validar stock
                 item["cantidad"] = nueva_cantidad
                 flash("✅ Cantidad Actualizada en el Carrito.", "info")
@@ -336,17 +336,21 @@ def actualizar(id_producto):
     return redirect(url_for("dashboard"))
 
 
-
-@app.route("/eliminar/<int:id>", methods=["POST"])
+@app.route("/eliminar/<int:id_producto>", methods=["POST"])
 @login_required
-def eliminar_producto(id):
+def eliminar_producto(id_producto):
+    if current_user.rol != "Administrador":
+        flash("No tienes permiso para realizar esta acción.", "danger")
+        return redirect(url_for("dashboard"))
+
     conexion = obtener_conexion_mysql()
     cursor = conexion.cursor()
-    cursor.execute("DELETE FROM productos WHERE id_producto=%s", (id,))
+    # Marcar como inactivo en lugar de borrar
+    cursor.execute("UPDATE productos SET activo=0 WHERE id_producto=%s", (id_producto,))
     conexion.commit()
     conexion.close()
-    flash("🗑️ Producto eliminado", "info")
-    return redirect(url_for("listar_productos"))
+    flash("🗑️ Producto marcado como inactivo", "info")
+    return redirect(url_for("dashboard"))
 
 
 # ------------------ ARCHIVOS ------------------
@@ -428,11 +432,11 @@ def dashboard():
     cursor = conexion.cursor(dictionary=True)
 
     if current_user.rol == "Administrador":
-        # Métricas
-        cursor.execute("SELECT COUNT(*) AS total FROM usuarios")
+        # Métricas solo usuarios y productos activos
+        cursor.execute("SELECT COUNT(*) AS total FROM usuarios WHERE activo = 1")
         total_usuarios = cursor.fetchone()["total"]
-
-        cursor.execute("SELECT COUNT(*) AS total FROM productos")
+        
+        cursor.execute("SELECT COUNT(*) AS total FROM productos WHERE activo = 1")
         total_productos = cursor.fetchone()["total"]
 
         cursor.execute("SELECT COUNT(*) AS total FROM ventas")
@@ -440,13 +444,13 @@ def dashboard():
 
         cursor.execute("SELECT IFNULL(SUM(total),0) AS ingresos FROM ventas")
         ingresos = cursor.fetchone()["ingresos"]
-
-        # Usuarios
-        cursor.execute("SELECT * FROM usuarios")
+        
+        # Usuarios activos
+        cursor.execute("SELECT * FROM usuarios WHERE activo = 1")
         usuarios = cursor.fetchall()
-
-        # Productos
-        cursor.execute("SELECT * FROM productos")
+        
+        # Productos activos
+        cursor.execute("SELECT * FROM productos WHERE activo = 1")
         productos = cursor.fetchall()
 
         # Ventas
@@ -516,12 +520,11 @@ def eliminar_usuario(id_usuario):
 
     conexion = obtener_conexion_mysql()
     cursor = conexion.cursor()
-
-    cursor.execute("DELETE FROM usuarios WHERE id_usuario = %s", (id_usuario,))
+    # Marcar como inactivo en lugar de borrar
+    cursor.execute("UPDATE usuarios SET activo=0 WHERE id_usuario=%s", (id_usuario,))
     conexion.commit()
     conexion.close()
-
-    flash("🗑️ Usuario Eliminado Correctamente.", "success")
+    flash("🗑️ Usuario marcado como inactivo", "info")
     return redirect(url_for("dashboard"))
 
 
@@ -559,6 +562,7 @@ def detalle_venta(id_venta):
 
     conexion.close()
     return render_template("detalle_venta.html", venta=venta, detalles=detalles)
+
 # --- Eliminar venta ---
 @app.route("/eliminar_venta/<int:id_venta>", methods=["POST", "GET"])
 @login_required
@@ -577,7 +581,7 @@ def eliminar_venta(id_venta):
         # Luego borrar la venta
         cursor.execute("DELETE FROM ventas WHERE id_venta = %s", (id_venta,))
         conexion.commit()
-        flash("Venta eliminada correctamente.", "success")
+        flash("🗑️ Venta eliminada correctamente.", "success")
     except Exception as e:
         flash(f"Error al eliminar la venta: {e}", "danger")
     finally:

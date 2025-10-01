@@ -67,10 +67,10 @@
                 <td>
                     <a href="{{ url_for('editar_producto', id_producto=p.id_producto) }}"
                         class="btn btn-sm btn-primary">✏️ Editar</a>
-                    <form method="POST" action="{{ url_for('eliminar_producto', id=p.id_producto) }}"
+                    <form method="POST" action="{{ url_for('eliminar_producto', id_producto=p.id_producto) }}"
                         style="display:inline;">
                         <button type="submit" class="btn btn-sm btn-danger"
-                            onclick="return confirm('¿Eliminar este producto?');">🗑 Eliminar</button>
+                            onclick="return confirm('¿Marcar este producto como inactivo?');">🗑 Inactivar</button>
                     </form>
                 </td>
             </tr>

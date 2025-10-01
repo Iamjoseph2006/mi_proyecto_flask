@@ -26,25 +26,33 @@
         <div class="col-md-3">
             <div class="card p-3 bg-light shadow-sm">
                 <h4 class="card-title">Usuarios</h4>
-                <p class="fs-4 text-center"><h3 class="text-center"><span class="contador-int" data-target="{{ data.usuarios }}">0</span></h3></p>
+                <p class="fs-4 text-center">
+                <h3 class="text-center"><span class="contador-int" data-target="{{ data.usuarios }}">0</span></h3>
+                </p>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card p-3 bg-light shadow-sm">
                 <h4 class="card-title">Productos</h4>
-                <p class="fs-4"><h3 class="text-center"><span class="contador-int" data-target="{{ data.productos }}">0</span></h3></p>
+                <p class="fs-4">
+                <h3 class="text-center"><span class="contador-int" data-target="{{ data.productos }}">0</span></h3>
+                </p>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card p-3 bg-light shadow-sm">
                 <h4 class="card-title">Ventas</h4>
-                <p class="fs-4"><h3 class="text-center"><span class="contador-int" data-target="{{ data.ventas }}">0</span></h3></p>
+                <p class="fs-4">
+                <h3 class="text-center"><span class="contador-int" data-target="{{ data.ventas }}">0</span></h3>
+                </p>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card p-3 bg-light shadow-sm">
                 <h4 class="card-title">Ingresos</h4>
-                <p class="fs-4"><h3 class="text-center">$<span class="contador-float" data-target="{{ data.ingresos }}">0</span></h3></p>
+                <p class="fs-4">
+                <h3 class="text-center">$<span class="contador-float" data-target="{{ data.ingresos }}">0</span></h3>
+                </p>
             </div>
         </div>
     </div>
@@ -79,7 +87,7 @@
                     <form method="POST" action="{{ url_for('eliminar_usuario', id_usuario=u.id_usuario) }}"
                         style="display:inline;">
                         <button type="submit" class="btn btn-sm btn-danger"
-                            onclick="return confirm('¿Eliminar este usuario?');">🗑 Eliminar</button>
+                            onclick="return confirm('¿Inactivar a este usuario?');">🗑 Inactivar</button>
                     </form>
                 </td>
             </tr>
@@ -148,10 +156,10 @@
                 <td>
                     <a href="{{ url_for('editar_producto', id_producto=p.id_producto) }}"
                         class="btn btn-sm btn-primary">✏️ Editar</a>
-                    <form method="POST" action="{{ url_for('eliminar_producto', id=p.id_producto) }}"
+                    <form method="POST" action="{{ url_for('eliminar_producto', id_producto=p.id_producto) }}"
                         style="display:inline;">
                         <button type="submit" class="btn btn-sm btn-danger"
-                            onclick="return confirm('¿Eliminar este producto?');">🗑 Eliminar</button>
+                            onclick="return confirm('¿Marcar este producto como inactivo?');">🗑 Inactivar</button>
                     </form>
                 </td>
             </tr>
@@ -250,44 +258,44 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-    const countersInt = document.querySelectorAll('.contador-int');
-    countersInt.forEach(counter => {
-        const target = parseInt(counter.getAttribute('data-target'));
-        let count = 0;
-        const increment = 1; // suma 1 por paso
-        const stepTime = 300; // 300ms entre cada incremento
+    document.addEventListener("DOMContentLoaded", () => {
+        const countersInt = document.querySelectorAll('.contador-int');
+        countersInt.forEach(counter => {
+            const target = parseInt(counter.getAttribute('data-target'));
+            let count = 0;
+            const increment = 1; // suma 1 por paso
+            const stepTime = 300; // 300ms entre cada incremento
 
-        const interval = setInterval(() => {
-            count += increment;
-            if(count >= target){
-                counter.innerText = target;
-                clearInterval(interval);
-            } else {
-                counter.innerText = count;
-            }
-        }, stepTime);
+            const interval = setInterval(() => {
+                count += increment;
+                if (count >= target) {
+                    counter.innerText = target;
+                    clearInterval(interval);
+                } else {
+                    counter.innerText = count;
+                }
+            }, stepTime);
+        });
+
+        const countersFloat = document.querySelectorAll('.contador-float');
+        countersFloat.forEach(counter => {
+            const target = parseFloat(counter.getAttribute('data-target'));
+            let count = 0;
+            const steps = 60;  // cantidad de pasos
+            const increment = target / steps;
+            const stepTime = 25;
+
+            const interval = setInterval(() => {
+                count += increment;
+                if (count >= target) {
+                    counter.innerText = target.toFixed(2);
+                    clearInterval(interval);
+                } else {
+                    counter.innerText = count.toFixed(2);
+                }
+            }, stepTime);
+        });
     });
-
-    const countersFloat = document.querySelectorAll('.contador-float');
-    countersFloat.forEach(counter => {
-        const target = parseFloat(counter.getAttribute('data-target'));
-        let count = 0;
-        const steps = 60;  // cantidad de pasos
-        const increment = target / steps;
-        const stepTime = 25;
-
-        const interval = setInterval(() => {
-            count += increment;
-            if(count >= target){
-                counter.innerText = target.toFixed(2);
-                clearInterval(interval);
-            } else {
-                counter.innerText = count.toFixed(2);
-            }
-        }, stepTime);
-    });
-});
 </script>
 
 {% endblock %}
