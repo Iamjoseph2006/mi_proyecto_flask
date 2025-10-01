@@ -102,7 +102,11 @@ main {
   flex: 1;
   /* Ocupa el espacio disponible entre navbar y footer */
 }
-h4, h5.card-title {
+h4.card-title{
+  color: #704f46; /* opcional: para que el texto se vea */
+    font-weight: bold;           /* negrita */
+}
+h5.card-title {
     color: #704f46; /* opcional: para que el texto se vea */
     font-weight: bold;           /* negrita */
 }

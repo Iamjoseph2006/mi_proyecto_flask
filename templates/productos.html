@@ -26,10 +26,10 @@
         <div class="col-md-4 mb-4">
             <div class="card shadow-sm h-100">
                 <div class="card-body text-center">
-                    <h5 class="card-title">{{ prod.nombre }}</h5>
+                    <h4 class="card-title">{{ prod.nombre }}</h4>
                     <p class="card-text">Categoría: {{ prod.categoria }}</p>
                     <p class="card-text">Stock: {{ prod.cantidad }}</p>
-                    <p class="card-text text-success fw-bold">${{ "%.2f"|format(prod.precio) }}</p>
+                    <h3 class="card-text text-success fw-bold text-center">${{ "%.2f"|format(prod.precio) }}</h3>
                     <a href="{{ url_for('agregar_carrito', id_producto=prod.id_producto) }}"
                         class="btn btn-outline-acento">
                         <i class="bi bi-cart-plus-fill"></i> Agregar al carrito
@@ -44,8 +44,10 @@
     </div>
 
     <!-- Ver carrito -->
-    <div class="text-center mt-4">
-        <a href="{{ url_for('carrito') }}" class="btn btn-primary">Ver Carrito</a>
+    <div class="text-center mt-5">
+        <a href="{{ url_for('carrito') }}" class="btn btn-primary btn-lg shadow-sm">
+            🛍️ Ver Carrito
+        </a>
     </div>
 </section>
 {% endblock %}

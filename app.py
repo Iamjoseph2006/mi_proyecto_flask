@@ -96,8 +96,12 @@ def leer_csv():
 # ------------------ RUTAS PÁGINAS ------------------
 @app.route("/")
 def index():
-
-    return render_template("index.html")
+    conexion = obtener_conexion_mysql()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM productos")
+    productos = cursor.fetchall()
+    conexion.close()
+    return render_template("index.html", productos=productos)
 
 @app.route("/about")
 def about():
@@ -188,10 +192,10 @@ def actualizar_carrito(id_producto):
         if item["id_producto"] == id_producto:
             if nueva_cantidad <= 0:
                 carrito.remove(item)  # Eliminar si es 0
-                flash("Producto eliminado del carrito.", "warning")
+                flash("🗑️ Producto eliminado del carrito.", "warning")
             elif nueva_cantidad <= producto["cantidad"]:  # Validar stock
                 item["cantidad"] = nueva_cantidad
-                flash("Cantidad Actualizada en el Carrito.", "info")
+                flash("✅ Cantidad Actualizada en el Carrito.", "info")
             else:
                 flash("Stock Insuficiente.", "danger")
             break
@@ -268,8 +272,8 @@ def crear_producto():
                        (nombre, categoria, cantidad, precio))
         conexion.commit()
         conexion.close()
-        flash("Producto Agregado Correctamente.", "success")
-        return redirect(url_for("productos"))
+        flash("✏️ Producto Agregado Correctamente.", "success")
+        return redirect(url_for("dashboard"))
 
     return render_template("crear_producto.html")
 
@@ -292,7 +296,7 @@ def editar_producto(id_producto):
         )
         conexion.commit()
         conexion.close()
-        flash("Producto Actualizado Correctamente.", "success")
+        flash("✏️ Producto Actualizado Correctamente.", "success")
         return redirect(url_for("productos"))
 
     # Para GET: obtenemos los datos del producto y mostramos el formulario
@@ -310,21 +314,25 @@ def editar_producto(id_producto):
 @app.route("/actualizar/<int:id_producto>", methods=["POST"])
 @login_required
 def actualizar(id_producto):
+    nombre = request.form["nombre"]
+    categoria = request.form["categoria"]
     cantidad = int(request.form["cantidad"])
     precio = float(request.form["precio"])
 
     conexion = obtener_conexion_mysql()
     cursor = conexion.cursor()
 
-    cursor.execute(
-        "UPDATE productos SET cantidad=%s, precio=%s WHERE id_producto=%s",
-        (cantidad, precio, id_producto)
-    )
+    cursor.execute("""
+        UPDATE productos
+        SET nombre=%s, categoria=%s, cantidad=%s, precio=%s
+        WHERE id_producto=%s
+    """, (nombre, categoria, cantidad, precio, id_producto))
+
     conexion.commit()
     print(f"Filas afectadas: {cursor.rowcount}")
     conexion.close()
 
-    flash("✏️ Producto Actualizado", "info")
+    flash("✏️ Producto actualizado correctamente", "info")
     return redirect(url_for("dashboard"))
 
 

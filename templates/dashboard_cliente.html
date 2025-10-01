@@ -3,7 +3,7 @@
 {% block content %}
 
 <!-- MENSAJES FLASH COMPACTOS -->
-<div class="container mt-3" style="max-width: 400px; margin-left: auto; margin-right: auto;">
+<div class="container mt-3" style="max-width: 400px; margin:auto;">
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     {% for category, message in messages %}
@@ -17,42 +17,37 @@
     {% endwith %}
 </div>
 
-<section id="productos" class="container my-5 text-center">
-    <h2 class="section-title">Mis Compras</h2>
-    <h3>Bienvenido/a, {{ current_user.nombre }} 👋</h3>
+<section class="container my-5 text-center">
+    <h2 class="section-title mb-4">Mis Compras</h2>
+    <h3 class="mb-4">Bienvenido/a, {{ current_user.nombre }} 👋</h3>
 
-    {% set pagina = request.args.get('pagina', 1)|int %}
-    {% set por_pagina = 5 %}
-    {% set inicio = (pagina - 1) * por_pagina %}
-    {% set fin = inicio + por_pagina %}
-    {% set compras_paginadas = compras[inicio:fin] %}
-    {% set total_paginas = (compras|length // por_pagina) + (1 if compras|length % por_pagina > 0 else 0) %}
+    {% if compras %}
+    <div class="row g-4 justify-content-center">
+        {% set pagina = request.args.get('pagina', 1)|int %}
+        {% set por_pagina = 5 %}
+        {% set inicio = (pagina - 1) * por_pagina %}
+        {% set fin = inicio + por_pagina %}
+        {% set compras_paginadas = compras[inicio:fin] %}
+        {% set total_paginas = (compras|length // por_pagina) + (1 if compras|length % por_pagina > 0 else 0) %}
 
-    <table class="table table-striped mt-4">
-        <thead>
-            <tr>
-                <th>ID Venta</th>
-                <th>Fecha</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for c in compras_paginadas %}
-            <tr>
-                <td>{{ c.id_venta }}</td>
-                <td>{{ c.fecha }}</td>
-                <td>${{ "%.2f"|format(c.total) }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="3" class="text-center">No tienes compras registradas.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        {% for c in compras_paginadas %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm h-100 border-0 compra-card">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <h5 class="card-title fw-bold">Compra #{{ c.id_venta }}</h5>
+                    <p class="card-text text-muted mb-2">Fecha: {{ c.fecha }}</p>
+                    <p class="card-text fs-5 text-success fw-bold">Total: ${{ "%.2f"|format(c.total) }}</p>
+                    <a href="{{ url_for('detalle_venta', id_venta=c.id_venta) }}" class="btn btn-outline-acento mt-2">
+                        Ver Detalle
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 
     <!-- Paginación Bootstrap -->
-    <nav aria-label="Page navigation">
+    <nav aria-label="Page navigation" class="mt-4">
         <ul class="pagination justify-content-center">
             <li class="page-item {% if pagina == 1 %}disabled{% endif %}">
                 <a class="page-link" href="{{ url_for('dashboard', pagina=pagina-1) }}">Anterior</a>
@@ -67,5 +62,21 @@
             </li>
         </ul>
     </nav>
+
+    {% else %}
+    <p class="text-center mt-4">No tienes compras registradas.</p>
+    {% endif %}
 </section>
+
+<style>
+    .compra-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .compra-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+</style>
+
 {% endblock %}
